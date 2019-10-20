@@ -103,7 +103,6 @@ curl -v  -k -X POST \
 }'   
 }
 
-
 createUniverse () {
 
 curl -k -s  -X POST \
