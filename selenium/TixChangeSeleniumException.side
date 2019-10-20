@@ -1,0 +1,67 @@
+{
+  "id": "c9ef78cb-18d0-4931-ac7a-0cd3761c14bf",
+  "version": "2.0",
+  "name": "TixChangeSelenimumException",
+  "url": "http://uc2.jtixchange.com/",
+  "tests": [{
+    "id": "da7c8895-69cc-4386-92c2-448789264aab",
+    "name": "EndToEnd",
+    "commands": [{
+      "id": "cc2144f4-90a5-460c-8395-1870e22374aa",
+      "comment": "",
+      "command": "open",
+      "target": "/jtixchange_web/shop/index.shtml",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "815f1bc7-8f47-48d0-bf35-bc9a999dbe56",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1596x1310",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0a1e49a3-c58a-4bca-93ca-97755d7da774",
+      "comment": "",
+      "command": "click",
+      "target": "css=tr:nth-child(2) a",
+      "targets": [
+        ["css=tr:nth-child(2) a", "css:finder"],
+        ["xpath=(//a[contains(@href, '/jtixchange_web/shop/viewCategory.shtml?categoryId=CONCERTS')])[2]", "xpath:href"],
+        ["xpath=//tr[2]/td/a", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c878013a-8a5d-4fab-8b9f-c4ed1aad017e",
+      "comment": "",
+      "command": "click",
+      "target": "css=tr:nth-child(3) font",
+      "targets": [
+        ["css=tr:nth-child(3) font", "css:finder"],
+        ["xpath=//tr[3]/td/b/a/font", "xpath:position"],
+        ["xpath=//font[contains(.,'MU-JM-01')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ff5a6608-113d-497d-b9e7-16d9ccb55aee",
+      "comment": "",
+      "command": "click",
+      "target": "css=tr:nth-child(2) img",
+      "targets": [
+        ["css=tr:nth-child(2) img", "css:finder"],
+        ["xpath=//td[5]/a/img", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "6deff1e5-b4ab-4931-b3f2-48185f67be54",
+    "name": "TixChangeExceptionUC2",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["da7c8895-69cc-4386-92c2-448789264aab"]
+  }],
+  "urls": ["http://uc2.jtixchange.com/jtixchange_web/shop/index.shtml", "http://uc2.jtixchange.com/"],
+  "plugins": []
+}

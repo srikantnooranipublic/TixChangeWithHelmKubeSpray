@@ -1,0 +1,56 @@
+# Create necessary Cluster role needed
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: caapm-cluster-role
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - nodes/proxy
+  - services
+  - pods
+  - resourcequotas
+  - replicationcontrollers
+  - limitranges
+  - namespaces
+  - persistentvolumes
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - deployments
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: caapm
+  namespace: {{ .Release.Namespace }}
+
+---
+# ClusterRoleBinding for binding with Service Account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: caapm-cluster-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: caapm-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: caapm
+  namespace: {{ .Release.Namespace }}

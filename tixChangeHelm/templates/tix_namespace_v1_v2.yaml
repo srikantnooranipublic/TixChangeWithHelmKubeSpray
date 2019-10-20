@@ -1,0 +1,12 @@
+# ------------------- Create Namespace used for TixChange  ------------------- #
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tixchange-v1
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tixchange-v2

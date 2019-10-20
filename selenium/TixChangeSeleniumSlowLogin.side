@@ -1,0 +1,158 @@
+{
+  "id": "46f2ba7f-bc76-42e0-9bfb-bcaceafa3e21",
+  "version": "2.0",
+  "name": "TixChangeSeleniumSlowLogin",
+  "url": "http://uc1.jtixchange.com",
+  "tests": [{
+    "id": "098d38a8-c63b-465f-bb5c-2918468b2b4c",
+    "name": "SlowUserLogin",
+    "commands": [{
+      "id": "69bdfc14-5a4f-400c-8728-5717b1edcd8e",
+      "comment": "",
+      "command": "open",
+      "target": "/jtixchange_web/shop/index.shtml",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "7a29e46b-21fd-4c3c-987c-3094e74a4ff3",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1633x1287",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "880bd804-3fc1-47a5-b092-ba6530506a1c",
+      "comment": "",
+      "command": "pause",
+      "target": "",
+      "targets": [],
+      "value": "2000"
+    }, {
+      "id": "54bd97e8-6abe-4c3c-b777-6bb80e3fb72e",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "name=img_signin",
+      "targets": [],
+      "value": "3000"
+    }, {
+      "id": "d0af449f-9590-49f1-95f6-62d2bebcfa98",
+      "comment": "",
+      "command": "click",
+      "target": "name=img_signin",
+      "targets": [
+        ["name=img_signin", "name"],
+        ["css=td > a:nth-child(3) > img", "css:finder"],
+        ["xpath=//img[@name='img_signin']", "xpath:attributes"],
+        ["xpath=//a[2]/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f6ba5366-4993-4a34-8642-4fd32eff588a",
+      "comment": "",
+      "command": "click",
+      "target": "name=username",
+      "targets": [
+        ["name=username", "name"],
+        ["css=tr:nth-child(2) input", "css:finder"],
+        ["xpath=//input[@name='username']", "xpath:attributes"],
+        ["xpath=//td[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "5b6225b5-9404-45cc-ad72-736db58d81ee",
+      "comment": "",
+      "command": "click",
+      "target": "name=username",
+      "targets": [
+        ["name=username", "name"],
+        ["css=tr:nth-child(2) input", "css:finder"],
+        ["xpath=//input[@name='username']", "xpath:attributes"],
+        ["xpath=//td[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "55172407-3d25-4215-bee0-a2e4bed20e46",
+      "comment": "",
+      "command": "doubleClick",
+      "target": "name=username",
+      "targets": [
+        ["name=username", "name"],
+        ["css=tr:nth-child(2) input", "css:finder"],
+        ["xpath=//input[@name='username']", "xpath:attributes"],
+        ["xpath=//td[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "1c483ac7-e32d-4d20-9c24-9936a35d1a70",
+      "comment": "",
+      "command": "type",
+      "target": "name=username",
+      "targets": [
+        ["name=username", "name"],
+        ["css=tr:nth-child(2) input", "css:finder"],
+        ["xpath=//input[@name='username']", "xpath:attributes"],
+        ["xpath=//td[2]/input", "xpath:position"]
+      ],
+      "value": "user5"
+    }, {
+      "id": "5582f291-63e7-4f04-b26b-cc82ec653bce",
+      "comment": "",
+      "command": "type",
+      "target": "name=password",
+      "targets": [
+        ["name=password", "name"],
+        ["css=tr:nth-child(3) input", "css:finder"],
+        ["xpath=//input[@name='password']", "xpath:attributes"],
+        ["xpath=//tr[3]/td[2]/input", "xpath:position"]
+      ],
+      "value": "user5"
+    }, {
+      "id": "810c3f12-6407-4416-8c56-e194637244de",
+      "comment": "",
+      "command": "click",
+      "target": "css=tr:nth-child(5) input",
+      "targets": [
+        ["css=tr:nth-child(5) input", "css:finder"],
+        ["xpath=(//input[@type='image'])[2]", "xpath:attributes"],
+        ["xpath=//tr[5]/td[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "89f07118-7352-4839-85af-10f71c96f6a5",
+      "comment": "",
+      "command": "pause",
+      "target": "",
+      "targets": [],
+      "value": "2000"
+    }, {
+      "id": "0eccb0d5-425e-4046-9bf0-2b5700391e42",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "name=img_signout",
+      "targets": [],
+      "value": "3000"
+    }, {
+      "id": "ce80d7e1-1e8c-4544-9f61-0c2349ed15e7",
+      "comment": "",
+      "command": "click",
+      "target": "name=img_signout",
+      "targets": [
+        ["name=img_signout", "name"],
+        ["css=td > a:nth-child(3) > img", "css:finder"],
+        ["xpath=//img[@name='img_signout']", "xpath:attributes"],
+        ["xpath=//a[2]/img", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "859f4b65-0351-4a00-bde2-aae8cf193746",
+    "name": "SlowLogin Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["098d38a8-c63b-465f-bb5c-2918468b2b4c"]
+  }],
+  "urls": ["http://uc1.jtixchange.com/"],
+  "plugins": []
+}

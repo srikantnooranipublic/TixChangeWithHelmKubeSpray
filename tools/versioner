@@ -1,0 +1,25 @@
+#!/bin/bash
+
+CURRENT_FOLDER=`dirname $BASH_SOURCE`
+
+#echo "Current Folder $CURRENT_FOLDER"
+
+VERSION_FILE=$HOME/.TixChangeVersionString
+
+if [ ! -f $VERSION_FILE ]; then
+	#echo "$VERSION_FILE not present"
+        echo 100 > $VERSION_FILE
+fi
+
+CURRENT_VERSION=`cat $VERSION_FILE`
+
+#echo "Current version is $CURRENT_VERSION"
+
+TEMP_NEW_VERSION=`echo $(( $CURRENT_VERSION + 1))`
+echo $TEMP_NEW_VERSION  > $VERSION_FILE
+
+NEW_VERSION=`echo 1.1.$TEMP_NEW_VERSION`
+
+
+
+echo "$NEW_VERSION"

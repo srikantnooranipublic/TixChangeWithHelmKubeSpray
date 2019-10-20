@@ -1,0 +1,136 @@
+{{- if or .Values.kubernetes_monitor_enabled }}
+
+# APMIA based Deployment.
+# Agent from Container1 will be reported to <Cluster_Name>|ClusterMonitoring|Infrastructure Agent
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cluster-deployment-monitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: apmia-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: apmia-deployment
+      labels:
+        app: apmia-deployment
+    spec:
+      serviceAccountName: caapm
+      containers:
+      - env:
+        - name: agentManager_url_1
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_url_1
+              name: caaiops-config-common
+{{- if .Values.agentManager_credential }}
+        - name: agentManager_credential
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_credential
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_host }}
+        - name: apmenv_agentManager_httpProxy_host
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_host
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_port }}
+        - name: apmenv_agentManager_httpProxy_port
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_port
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_username }}
+        - name: apmenv_agentManager_httpProxy_username
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_username
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_password }}
+        - name: apmenv_agentManager_httpProxy_password
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_password
+              name: caaiops-config-common
+{{ end }}
+
+        - name: KUEBRNETES_CLUSTER_MONITORING
+          value: "true"
+
+        #        - name: connectionurl
+        #          valueFrom:
+        #            configMapKeyRef:
+        #              key: connectionurl
+        #              name: caaiops-config-common
+        #        - name: apitoken
+        #          valueFrom:
+        #            configMapKeyRef:
+        #              key: apitoken
+        #              name: caaiops-config-common
+        - name: type
+          value: {{ .Values.type }}
+        - name: HostMonitoring
+          value: disabled
+        - name: apmenv_introscope_agent_hostName
+          valueFrom:
+            configMapKeyRef:
+              key: cluster_name
+              name: caaiops-config-common
+        - name: apmenv_introscope_agent_customProcessName
+          value: ClusterDeploymentMonitor
+        - name: apmenv_introscope_agent_agentName
+          value: Infrastructure Agent
+        - name: apmenv_introscope_agent_extensions_bundles_load
+          value: OpenshiftMonitor
+        - name: MIN_HEAP_VAL_IN_MB
+          value: "64"
+
+        - name: cluster_name
+          valueFrom:
+            configMapKeyRef:
+              key: cluster_name
+              name: caaiops-config-common
+
+        name: osemetainfo
+        image: {{ .Values.image }}
+{{- if .Values.kubernetes_resource_bound }}
+        resources:
+          limits:
+            cpu: 2
+            memory: 1G
+          requests:
+            cpu: 200m
+            memory: 300Mi
+{{end}}
+{{- if or (eq .Values.type "Kubernetes") }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - "if (( $(expr `date +%s` - `stat -c %Y /tmp/apmia-health/extensions/Kubernetes-health.txt`) > 900 )); then exit 1; fi"
+          initialDelaySeconds: 120
+{{end}}
+{{- if or (eq .Values.type "Openshift") }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - "if (( $(expr `date +%s` - `stat -c %Y /tmp/apmia-health/extensions/Openshift-health.txt`) > 900 )); then exit 1; fi"
+          initialDelaySeconds: 120
+{{end}}
+        imagePullPolicy: Always
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: apmia-deployment
+{{end}}

@@ -1,0 +1,69 @@
+# ------------------- TixChange BPA  Deployment ------------------- #
+
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2. I'm running 1.11.0
+kind: Deployment
+metadata:
+  name: tix-bpa-deploy
+  namespace: tixchange-v1
+  labels:
+    app: tixchange-bpa
+    tier: webserver
+    env: webserver
+spec:
+  selector:
+    matchLabels:
+      app: tixchange-bpa
+      tier: webserver
+  replicas: 1 
+  revisionHistoryLimit: 9 # how many revisions
+  strategy:
+    rollingUpdate:
+      maxSurge: 1 # how many on top of replicas you want
+      maxUnavailable: 1 # how many you can afford to be down
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: tixchange-bpa
+        tier: webserver
+        env: webserver 
+        apm: enabled
+      annotations:
+        ver: "1.0"
+    spec:
+      containers:
+        - name: tix-bpa
+          env:
+          - name: TIX_IP
+            value: TIX_IP_VAL
+          - name: TENANT_ID
+            value: TENANT_ID_VAL
+          - name: DXC_URL
+            value: DXC_URL_VAL
+          image: srikns/bpa-httpd:latest
+          imagePullPolicy: Always
+          ports:
+            - name: bpa-port
+              containerPort: 80
+      nodeSelector:
+        kubernetes.io/hostname: node3
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: bpa-svc
+  namespace: tixchange-v1
+  labels:
+    app: tixchange-bpa
+    tier: webserver
+spec:
+  selector:
+    app: tixchange-bpa 
+    tier: webserver 
+  ports:
+  - port: 8080 
+    name: bpa
+    targetPort: 80
+

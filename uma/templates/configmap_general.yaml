@@ -1,0 +1,17 @@
+# Common comfig map needed for All extensions
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: caaiops-config-common
+  namespace: {{ .Release.Namespace }}
+data:
+  cluster_name: {{ .Values.cluster_name }}
+  agentManager_url_1: {{ .Values.agentManager_url_1 }}
+  agentManager_credential: {{ .Values.agentManager_credential }}
+  agentManager_httpProxy_host: {{ .Values.agentManager_httpProxy_host }}
+  agentManager_httpProxy_port: "{{ .Values.agentManager_httpProxy_port }}"
+  agentManager_httpProxy_username: {{ .Values.agentManager_httpProxy_username }}
+  agentManager_httpProxy_password: "{{ .Values.agentManager_httpProxy_password }}"
+
+  apmia_min_heap: "256"
+  apmia_max_heap: "512"

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: selenium-standalone
+  #namespace: selenium
+  labels:
+    app: selenium-standalone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: selenium-standalone
+  template:
+    metadata:
+      labels:
+        app: selenium-standalone
+    spec:
+      volumes:
+      - name: seleniumfolder
+        hostPath:
+            path: /opt/ca/TixChangeK8sDemo/selenium/
+      hostAliases:
+      - ip: "HOST_IP"
+        hostnames:
+        - "uc1.jtixchange.com"
+        - "uc2.jtixchange.com"
+      containers:
+      - name: selenium-standalone
+        image: srikns/selenium-standalone:latest
+        imagePullPolicy: Always
+        #image: selenium/node-chrome:3.141.59-oxygen
+        env:
+          - name: APM_API_TOKEN
+            value: "APM_API_TOKEN_VALUE"
+          - name: APM_SAAS_URL
+            value: "APM_SAAS_URL_VALUE"
+          - name: SELENIUM_FOLDER
+            value: "/opt/ca/TixChangeK8sDemo/selenium"
+        volumeMounts:
+          - name: seleniumfolder
+            mountPath: /opt/ca/TixChangeK8sDemo/selenium/
+            #readOnly: true
+        #resources:
+          #limits:
+            #memory: "1000Mi"
+            #cpu: ".5"
+      nodeSelector:
+        kubernetes.io/hostname: node1
+

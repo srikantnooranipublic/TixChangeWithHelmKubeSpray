@@ -1,0 +1,46 @@
+{{- if or .Values.kubernetes_monitor_cluster_prometheus_exporters_enabled .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled .Values.kubernetes_remote_jmx_enabled }}
+
+  # Cluster Discovery Service
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: clusterinfo
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: cagent
+    module: clusterinfo
+  annotations:
+    ca.broadcom.application.name: kubernete-cluster-monitoring
+
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: clusterinfo
+      labels:
+        app: cagent
+        module: clusterinfo
+    spec:
+      serviceAccountName: caapm
+      containers:
+      - name: clusterinfo
+        image: {{ .Values.image }}
+{{- if .Values.kubernetes_resource_bound }}
+        resources:
+          limits:
+            cpu: 2
+            memory: 1G
+          requests:
+            cpu: 200m
+            memory: 300Mi
+{{end}}
+        imagePullPolicy: Always
+        command: ["/usr/local/openshift/apmia/jre/bin/java", "-Xms64m","-Xmx512m", "-jar", "/clusterinfo-1.0.jar"]
+        # Comment out this section in case you want to enable debug
+        # command: ["java", "-jar", "-Dlogging.level.com.ca.apm.broadcom.kubernetes.springboot.ClusterInfoController=DEBUG","/clusterinfo-1.0.jar"]
+      restartPolicy: Always
+
+  selector:
+    matchLabels:
+      module: clusterinfo
+{{ end }}

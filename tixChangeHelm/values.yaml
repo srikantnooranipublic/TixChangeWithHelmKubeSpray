@@ -1,0 +1,8 @@
+# Settings for the Agent to find the Enterprise Manager
+
+# Name for the Kubernetes Cluster.
+App_name: TixChange
+
+DeploymentEnv1: DataCenter_West
+DeploymentEnv2: DataCenter_East
+

@@ -1,0 +1,505 @@
+########################################################################
+# Introscope ProbeBuilder Directives File                              
+# 
+# Version: 11.1.0.3_fixes
+# Build: 11
+#                                                                      
+# DX APM Wily Introscope(R) Version 11.1.3_fixes Release 11.1.0.3_fixes
+# Copyright (c) 2019 Broadcom. All Rights Reserved.
+# Introscope(R) is a registered trademark of DX APM.
+########################################################################
+
+#############################################################
+# This file provides tracer groups
+#   for common Java 2 components.
+# Please use either toggles-full.pbd or toggles-typical.pbd
+#   to TurnOn specific tracing.
+#############################################################
+
+SetFlag: EJBMethodLevelTracing
+SetFlag: EJB3MethodLevelTracing
+
+
+#######################
+# EJB Configuration
+# ================
+
+# This list identifies classes which should be traced as
+# Enterprise Java Beans (EJBs).  If you are using EJBs which
+# are not identified by the directives listed here, you will
+# need to add them to this list.
+#
+# Use the "IdentifyClassAs" directive to add a single EJB
+# Use the "IdentifyInheritedAs" directive to track all direct subclasses of an parent EJB
+
+# EJB 2.0 specification
+# 
+IdentifyDeepInheritedAs: javax.ejb.SessionBean SessionBeanTracing
+IdentifyDeepInheritedAs: javax.ejb.EntityBean EntityBeanTracing
+IdentifyDeepInheritedAs: javax.ejb.MessageDrivenBean MessageDrivenBeanTracing
+# Directives without deep inheritance are faster but may miss some bean implementations
+#IdentifyInheritedAs: javax.ejb.SessionBean SessionBeanTracing
+#IdentifyInheritedAs: javax.ejb.EntityBean EntityBeanTracing
+#IdentifyInheritedAs: javax.ejb.MessageDrivenBean MessageDrivenBeanTracing
+
+# EJB 2.0 Client stubs
+IdentifyDeepInheritedAs: javax.ejb.EJBObject EJB2StubTracing
+# Directive without deep inheritance is faster but may miss some bean implementations
+#IdentifyInheritedAs: javax.ejb.EJBObject EJB2StubTracing
+
+# EJB 3.0 specification
+IdentifyInheritedAnnotatedClassAs: javax.ejb.Stateless SessionBean3Tracing
+IdentifyInheritedAnnotatedClassAs: javax.ejb.Stateful SessionBean3Tracing
+IdentifyInheritedAnnotatedClassAs: javax.persistence.Entity EntityBean3Tracing
+IdentifyInheritedAnnotatedClassAs: javax.ejb.MessageDriven MessageDrivenBean3Tracing
+IdentifyInheritedAnnotatedClassAs: javax.ejb.Singleton SessionBean3Tracing
+
+# Directives without inheritance are faster but may miss some bean implementations
+#IdentifyAnnotatedClassAs: javax.ejb.Stateless SessionBean3Tracing
+#IdentifyAnnotatedClassAs: javax.ejb.Stateful SessionBean3Tracing
+#IdentifyAnnotatedClassAs: javax.persistence.Entity EntityBean3Tracing
+#IdentifyAnnotatedClassAs: javax.ejb.MessageDriven MessageDrivenBean3Tracing
+# EJB 3.0 Client stubs
+IdentifyInheritedAnnotatedClassAs: javax.ejb.Remote EJB3StubTracing
+# Directive without inheritance is faster but may miss some bean implementations
+#IdentifyAnnotatedClassAs: javax.ejb.Remote EJB3StubTracing
+SkipAnnotatedForFlag: javax.ejb.Stateless EJB3StubTracing
+SkipAnnotatedForFlag: javax.ejb.Stateful EJB3StubTracing
+SkipAnnotatedForFlag: javax.ejb.Singleton EJB3StubTracing
+
+#######################
+# JSP Configuration
+# ================
+
+# This list identifies classes which are used by various
+# JSP implementations for the generated files.  If you
+# are using a JSP framework not identified by the directives
+# listed here and not included in a separate directives file,
+# you will need to add it to this list.
+#
+# Use the "IdentifyInheritedAs" directive to track all
+# direct subclasses or interface implementations
+
+# JSP 1.2 specification
+IdentifyInheritedAs: javax.servlet.jsp.JspPage JSPTracing
+IdentifyInheritedAs: javax.servlet.jsp.HttpJspPage JSPTracing
+
+# JBoss is happier if we do the directives below
+SkipClassForFlag: org.apache.jasper.servlet.JspServlet JSPTracing
+SkipClassForFlag: org.apache.jasper.runtime.HttpJspBase JSPTracing
+IdentifyInheritedAs: org.apache.jasper.servlet.JspServlet JSPTracing
+IdentifyInheritedAs: org.apache.jasper.runtime.HttpJspBase JSPTracing
+
+# Fix for TT#78747: Duplicate JSP Metrics under JSP and Servlets
+SkipClassForFlag: org.apache.jasper.runtime.HttpJspBase HTTPServletTracing
+
+#######################
+# Servlet Configuration
+# ================
+
+# This list identifies the core servlet superclass.
+# If you are using servlets not identified by the directives
+# listed here and not included in a separate directives file,
+# you will need to add them to this list.
+#
+# Use the "IdentifyInheritedAs" directive to track all
+# direct subclasses or interface implementations
+
+#IdentifyDeepInheritedAs: javax.servlet.http.HttpServlet HTTPServletTracing
+IdentifyClassAs: org.apache.struts.action.ActionServlet HTTPServletTracing
+
+
+# The Service class for the HttpJspBase is the base class for JSP generated servlets.
+# Its service method should be called only from within the JSPServlet service method.
+# We can skip it
+SkipClassForFlag: org.apache.jasper.runtime.HttpJspBase HTTPServletTracing
+
+#######################
+# XML Configuration
+# ================
+
+# This list identifies classes which are used by various
+# XML implementations.  If you are using a XML parser not 
+# identified by the directives listed here and not included 
+# in a separate directives file, you will need to add it to 
+# this list.
+
+IdentifyInheritedAs: org.xml.sax.Parser XMLSAXTracing # sax v1
+IdentifyInheritedAs: org.xml.sax.XMLReader XMLSAXTracing # sax v2
+IdentifyInheritedAs: javax.xml.parsers.SAXParser XMLSAXTracing # jaxp
+IdentifyClassAs: javax.xml.parsers.SAXParser XMLSAXTracing # jaxp
+IdentifyInheritedAs: org.apache.xerces.framework.XMLParser XMLSAXTracing # Apache/Xerces implementation
+IdentifyClassAs: org.apache.xerces.framework.XMLParser XMLSAXTracing # Apache/Xerces implementation
+IdentifyInheritedAs: org.apache.xerces.parsers.SAXParser XMLSAXTracing # Apache/Xerces implementation
+IdentifyClassAs: org.apache.xerces.parsers.SAXParser XMLSAXTracing # Apache/Xerces implementation
+IdentifyInheritedAs: org.apache.xerces.parsers.DOMParser XMLSAXTracing # Apache/Xerces implementation
+IdentifyClassAs: org.apache.xerces.parsers.DOMParser XMLSAXTracing # Apache/Xerces implementation
+
+IdentifyInheritedAs: javax.xml.transform.Transformer XSLTTracing # JAXP/TRaX 1.1
+IdentifyClassAs: javax.xml.transform.Transformer XSLTTracing # JAXP/TRaX 1.1
+
+
+#######################
+# JTA Configuration
+# ================
+
+# This list identifies classes which should be traced within
+# the Java Transaction API (JTA).  If you are using a JTA implementation
+# which is not identified by the directives listed here, you will
+# need to add them to this list.
+
+IdentifyInheritedAs: javax.transaction.Transaction JTACommitTracing
+IdentifyInheritedAs: javax.transaction.UserTransaction JTACommitTracing
+IdentifyInheritedAs: javax.transaction.TransactionManager JTACommitTracing
+IdentifyInheritedAs: javax.transaction.xa.XAResource JTACommitTracing
+
+
+#######################
+# JNDI Configuration
+# ================
+
+# This list identifies classes implementing the Java Naming
+# and Directory Interface (JNDI).  If you are using a JNDI implementation
+# which is not identified by the directives listed here, you will
+# need to add them to this list.
+
+IdentifyInheritedAs: javax.naming.Context JNDITracing
+IdentifyInheritedAs: javax.naming.InitialContext JNDITracing
+IdentifyClassAs: javax.naming.InitialContext JNDITracing
+IdentifyInheritedAs: javax.naming.directory.DirContext JNDITracing
+IdentifyInheritedAs: javax.naming.directory.InitialDirContext JNDITracing
+IdentifyClassAs: javax.naming.directory.InitialDirContext JNDITracing
+IdentifyInheritedAs: javax.naming.event.EventContext JNDITracing
+IdentifyInheritedAs: javax.naming.event.EventDirContext JNDITracing
+IdentifyInheritedAs: javax.naming.ldap.LdapContext JNDITracing
+IdentifyInheritedAs: javax.naming.ldap.InitialLdapContext JNDITracing
+IdentifyClassAs: javax.naming.ldap.InitialLdapContext JNDITracing
+
+
+
+#######################
+# JavaMail configuration
+# ================
+
+# This list identifies classes implementing the JavaMail
+# API.  If you are using a JavaMail implementation
+# which is not identified by the directives listed here, you will
+# need to add them to this list.
+
+IdentifyClassAs: javax.mail.Transport JavaMailTransportTracing
+IdentifyInheritedAs: javax.mail.Transport JavaMailTransportTracing
+
+
+#######################
+# JAXM configuration
+# ================
+
+# This list identifies classes listening to JAXM
+# messages.  If you are using a JAXM implementation
+# which is not identified by the directives listed here, you will
+# need to add them to this list.
+
+IdentifyInheritedAs: javax.xml.messaging.AsyncListener JAXMListenerTracing
+IdentifyInheritedAs: javax.xml.messaging.SyncListener JAXMListenerTracing
+# Add the JAXM dispatch servlet and subs to the listener group
+IdentifyClassAs: javax.xml.messaging.JAXMServlet JAXMListenerTracing
+IdentifyInheritedAs: javax.xml.messaging.JAXMServlet JAXMListenerTracing
+# Add the alternate MessageListener interface too
+IdentifyInheritedAs: javax.xml.messaging.MessageListener JAXMListenerTracing
+
+
+#######################
+# J2EE Connector configuration
+# ================
+
+# This list identifies classes implementing the J2EE Connector
+# API.  If you are using a J2EE Connector implementation
+# which is not identified by the directives listed here, you will
+# need to add them to this list.
+
+IdentifyInheritedAs: javax.resource.cci.Interaction J2eeConnectorTracing
+
+
+#########################################################
+# The following section of the file contains directives #
+# which implement the tracer groups listed above.       #
+# Do not make changes to any of the directives below    #
+# this line or Introscope will not work correctly.      #
+#########################################################
+
+
+#######################
+# EJB Tracer Group
+# ================
+# Defines the directives necessary for EJB tracing.
+
+# Client stubs
+SetFlag: EJB2StubTracing
+TraceComplexMethodsIfFlagged: EJB2StubTracing CorTracer "CorId"
+
+
+SetFlag: EJB3StubTracing
+TraceComplexMethodsIfFlagged: EJB3StubTracing CorTracer "CorId"
+ 
+# SessionBean
+SetFlag: SessionBeanTracing
+SetFlag: SessionBeanMethodLevelTracing
+IdentifyTwoFlagIntersectionAsAggregateFlag: SessionBeanTracing EJBMethodLevelTracing SessionBeanMethodLevelTracing
+
+TraceComplexMethodsIfFlagged: SessionBeanTracing EJB2BlamePointTracerDifferentInstances "EJB|Session|{classname}"
+TraceComplexMethodsIfFlagged: SessionBeanMethodLevelTracing EJB2BlamePointTracerDifferentMethods "EJB|Session|{classname}|{method}"
+TraceComplexMethodsIfFlagged: SessionBeanTracing CorTracer "CorId"
+SetTracerOrdering: EJB2BlamePointTracerDifferentInstances 20000
+SetTracerOrdering: EJB2BlamePointTracerDifferentMethods 20000
+
+# Static methods cannot be in EJB business interface
+SkipStaticMethodsForFlag: SessionBeanTracing
+SkipStaticMethodsForFlag: SessionBeanMethodLevelTracing
+
+# Skip internal method in EJB
+SkipMethodForFlag: SessionBeanTracing closeExtendedPersistenceContexts
+SkipMethodForFlag: SessionBeanMethodLevelTracing closeExtendedPersistenceContexts
+
+SetFlag: SessionBean3Tracing
+SetFlag: SessionBean3MethodLevelTracing
+IdentifyTwoFlagIntersectionAsAggregateFlag: SessionBean3Tracing EJB3MethodLevelTracing SessionBean3MethodLevelTracing
+
+TraceComplexMethodsIfFlagged: SessionBean3Tracing EJB3BlamePointTracerDifferentInstances "EJB|Session|{classname}"
+TraceComplexMethodsIfFlagged: SessionBean3MethodLevelTracing EJB3BlamePointTracerDifferentMethods "EJB|Session|{classname}|{method}"
+TraceComplexMethodsIfFlagged: SessionBean3Tracing CorTracer "CorId"
+SetTracerOrdering: EJB3BlamePointTracerDifferentInstances 20000
+SetTracerOrdering: EJB3BlamePointTracerDifferentMethods 20000
+
+# Static methods cannot be in EJB business interface
+SkipStaticMethodsForFlag: SessionBean3Tracing
+SkipStaticMethodsForFlag: SessionBean3MethodLevelTracing
+
+# Skip internal method in EJB
+SkipMethodForFlag: SessionBean3Tracing closeExtendedPersistenceContexts
+SkipMethodForFlag: SessionBean3MethodLevelTracing closeExtendedPersistenceContexts
+
+# EntityBean
+SetFlag: EntityBeanTracing
+SetFlag: EntityBeanMethodLevelTracing
+IdentifyTwoFlagIntersectionAsAggregateFlag: EntityBeanTracing EJBMethodLevelTracing EntityBeanMethodLevelTracing
+
+TraceComplexMethodsIfFlagged: EntityBeanTracing EJB2BlamePointTracerDifferentInstances "EJB|Entity|{classname}"
+TraceComplexMethodsIfFlagged: EntityBeanMethodLevelTracing EJB2BlamePointTracerDifferentInstances "EJB|Entity|{classname}|{method}"
+TraceComplexMethodsIfFlagged: EntityBeanTracing CorTracer "CorId"
+# Static methods cannot be in EJB business interface
+SkipStaticMethodsForFlag: EntityBeanTracing
+SkipStaticMethodsForFlag: EntityBeanMethodLevelTracing
+
+SetFlag: EntityBean3Tracing
+SetFlag: EntityBean3MethodLevelTracing
+IdentifyTwoFlagIntersectionAsAggregateFlag: EntityBean3Tracing EJB3MethodLevelTracing EntityBean3MethodLevelTracing
+
+TraceComplexMethodsIfFlagged: EntityBean3Tracing EJB3BlamePointTracerDifferentInstances "EJB|Entity|{classname}"
+TraceComplexMethodsIfFlagged: EntityBean3MethodLevelTracing EJB3BlamePointTracerDifferentInstances "EJB|Entity|{classname}|{method}"
+TraceComplexMethodsIfFlagged: EntityBean3Tracing CorTracer "CorId"
+# Static methods cannot be in EJB business interface
+SkipStaticMethodsForFlag: EntityBean3Tracing
+SkipStaticMethodsForFlag: EntityBean3MethodLevelTracing
+
+# MessageDrivenBean
+SetFlag: MessageDrivenBeanTracing
+SetFlag: MessageDrivenBeanMethodLevelTracing
+IdentifyTwoFlagIntersectionAsAggregateFlag: MessageDrivenBeanTracing EJBMethodLevelTracing MessageDrivenBeanMethodLevelTracing
+
+TraceComplexMethodsIfFlagged: MessageDrivenBeanTracing EJB2BlamePointTracerDifferentInstances "EJB|Message-driven|{classname}"
+TraceComplexMethodsIfFlagged: MessageDrivenBeanMethodLevelTracing EJB2BlamePointTracerDifferentInstances "EJB|Message-driven|{classname}|{method}"
+TraceComplexMethodsIfFlagged: MessageDrivenBeanTracing CorTracer "CorId"
+# Static methods cannot be in EJB business interface
+SkipStaticMethodsForFlag: MessageDrivenBeanTracing
+SkipStaticMethodsForFlag: MessageDrivenBeanMethodLevelTracing
+
+SetFlag: MessageDrivenBean3Tracing
+SetFlag: MessageDrivenBean3MethodLevelTracing
+IdentifyTwoFlagIntersectionAsAggregateFlag: MessageDrivenBean3Tracing EJB3MethodLevelTracing MessageDrivenBean3MethodLevelTracing
+
+TraceComplexMethodsIfFlagged: MessageDrivenBean3Tracing EJB3BlamePointTracerDifferentInstances "EJB|Message-driven|{classname}"
+TraceComplexMethodsIfFlagged: MessageDrivenBean3MethodLevelTracing EJB3BlamePointTracerDifferentInstances "EJB|Message-driven|{classname}|{method}"
+TraceComplexMethodsIfFlagged: MessageDrivenBean3Tracing CorTracer "CorId"
+# Static methods cannot be in EJB business interface
+SkipStaticMethodsForFlag: MessageDrivenBean3Tracing
+SkipStaticMethodsForFlag: MessageDrivenBean3MethodLevelTracing
+
+# EJB Tracer Class Mappings
+
+SetTracerClassMapping: CorTracer com.wily.introscope.agent.trace.CrossProcessCorrelationEjbTracer com.wily.introscope.probebuilder.validate.ResourceNameValidator
+SetTracerParameter: CorTracer newmode true
+SetTracerParameter: CorTracer useblame false
+SetTracerOrdering: CorTracer -90000
+
+#SetTracerClassMapping: EJB2BlamePointTracerDifferentInstances com.wily.introscope.agent.trace.BlamePointTracer com.wily.introscope.probebuilder.validate.ResourceNameValidator
+#SetTracerParameter: EJB2BlamePointTracerDifferentInstances manageejbcontext true
+#SetTracerParameter: EJB2BlamePointTracerDifferentInstances reentrancy instance
+##SetTracerParameter: EJB2BlamePointTracerDifferentInstances nameformatter com.wily.introscope.agent.trace.ejb.Ejb2BeanNameFormatter
+
+#SetTracerClassMapping: EJB2BlamePointTracerDifferentMethods com.wily.introscope.agent.trace.BlamePointTracer com.wily.introscope.probebuilder.validate.ResourceNameValidator
+#SetTracerParameter: EJB2BlamePointTracerDifferentMethods manageejbcontext true
+#SetTracerParameter: EJB2BlamePointTracerDifferentMethods reentrancy methodname
+##SetTracerParameter: EJB2BlamePointTracerDifferentMethods nameformatter com.wily.introscope.agent.trace.ejb.Ejb2BeanNameFormatter
+
+#SetTracerClassMapping: EJB3BlamePointTracerDifferentInstances com.wily.introscope.agent.trace.BlamePointTracer com.wily.introscope.probebuilder.validate.ResourceNameValidator
+#SetTracerParameter: EJB3BlamePointTracerDifferentInstances manageejbcontext true
+#SetTracerParameter: EJB3BlamePointTracerDifferentInstances reentrancy instance
+##SetTracerParameter: EJB3BlamePointTracerDifferentInstances nameformatter com.wily.introscope.agent.trace.ejb.Ejb3BeanNameFormatter
+
+#SetTracerClassMapping: EJB3BlamePointTracerDifferentMethods com.wily.introscope.agent.trace.BlamePointTracer com.wily.introscope.probebuilder.validate.ResourceNameValidator
+#SetTracerParameter: EJB3BlamePointTracerDifferentMethods manageejbcontext true
+#SetTracerParameter: EJB3BlamePointTracerDifferentMethods reentrancy methodname
+##SetTracerParameter: EJB3BlamePointTracerDifferentMethods nameformatter com.wily.introscope.agent.trace.ejb.Ejb3BeanNameFormatter
+
+#######################
+# JSP Tracer Group
+# ================
+# Defines the directives necessary for JSP tracing.
+
+SetFlag: JSPTracing
+SetFlag: JSPServletTracing
+TraceOneMethodWithParametersIfFlagged: JSPTracing _jspService JSPBlamePointTracer "JSP|{classname}"
+TraceOneMethodWithParametersIfFlagged: JSPServletTracing _jspService HttpServletTracer "JSPServlet|{classname}"
+
+
+#######################
+# HTTP Servlet Tracer Group
+# ================
+# Defines the directives necessary for HTTP servlet tracing.
+
+# There are two variants of the service method, a generic variant and
+# and http type specific variant.  We want to trace the http type
+# specific variant but also make sure we notice if the generic variant
+# is overridden and does not delegate to the http type specific variant
+#
+# service(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
+# service(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V
+
+SetFlag: HTTPServletTracing
+
+# Trace the http type specific service method
+
+TurnOn: HttpServletClassOnly
+SetFlag: HttpServletClassOnly
+IdentifyClassAs: javax.servlet.http.HttpServlet HttpServletClassOnly
+SetFlag: HttpServletTypeSpecificServiceTracing
+IdentifyTwoFlagIntersectionAsAggregateFlag: HTTPServletTracing HttpServletClassOnly HttpServletTypeSpecificServiceTracing
+
+TraceOneMethodWithParametersIfFlagged: HttpServletTypeSpecificServiceTracing service(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V HttpServletTracer Servlets
+TraceOneMethodIfFlagged: HttpServletTypeSpecificServiceTracing service(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V HttpServletBlamePointTracerDifferentInstances "Servlets|{classname}"
+
+# Trace the generic service method only if it is overridden
+
+TraceOneMethodWithParametersIfFlagged: HTTPServletTracing service(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V HttpServletTracer Servlets
+TraceOneMethodIfFlagged: HTTPServletTracing service(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V HttpServletBlamePointTracerDifferentInstances "Servlets|{classname}"
+
+# Application Server AutoProbe support
+
+SetFlag: HTTPAppServerAutoProbeServletTracing
+SubstituteClassIfFlagged: HTTPAppServerAutoProbeServletTracing javax.servlet.http.HttpServlet com.wily.introscope.agent.probe.servlet.ManagedHttpServlet
+
+
+#adding the new correlation tracer
+
+#TraceOneMethodIfFlagged: HttpServletTypeSpecificServiceTracing service(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V CorTracer "CorId"
+#TraceOneMethodIfFlagged: HTTPServletTracing service(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V CorTracer "CorId"
+
+#######################
+# XML Tracer Group
+# ================
+# Defines the directives necessary for XML tracing.
+
+SetFlag: XMLSAXTracing
+TraceOneMethodIfFlagged: XMLSAXTracing parse BlamePointTracerDifferentInstances "XML|SAX|{classname}"
+
+#
+SetFlag: XSLTTracing
+TraceOneMethodIfFlagged: XSLTTracing transform BlamePointTracerDifferentInstances "XML|XSLT|{classname}"
+
+
+#######################
+# JTA Tracer Group
+# ================
+# Defines the directives necessary for JTA tracing.
+
+SetFlag: JTACommitTracing
+TraceOneMethodIfFlagged: JTACommitTracing commit BlamePointTracerDifferentInstances "JTA|{classname}"
+
+
+#######################
+# JNDI Tracer Group
+# ================
+# Defines the directives necessary for JNDI tracing.
+
+SetFlag: JNDITracing
+
+TraceOneMethodIfFlagged: JNDITracing lookup BlamePointTracerDifferentInstances "JNDI|Context|{classname}"
+TraceOneMethodIfFlagged: JNDITracing lookupLink BlamePointTracerDifferentInstances "JNDI|Context|{classname}"
+TraceOneMethodIfFlagged: JNDITracing search BlamePointTracerDifferentInstances "JNDI|Context|{classname}"
+
+#######################
+# JavaMail tracer group
+# ================
+
+SetFlag: JavaMailTransportTracing
+TraceOneMethodIfFlagged: JavaMailTransportTracing send BlamePointTracerDifferentInstances "Java Mail|Transport|{classname}"
+TraceOneMethodIfFlagged: JavaMailTransportTracing sendMessage BlamePointTracerDifferentInstances "Java Mail|Transport|{classname}"
+
+
+#######################
+# JAXM tracer group
+# ================
+
+SetFlag: JAXMListenerTracing
+TraceOneMethodIfFlagged: JAXMListenerTracing onMessage BlamePointTracerDifferentInstances "XML|JAXM|Listeners|{classname}"
+
+
+#############################
+# J2EE Connector tracer group
+# ===========================
+
+SetFlag: J2eeConnectorTracing
+TraceOneMethodIfFlagged: J2eeConnectorTracing execute BlamePointTracerDifferentInstances "J2EE Connector|{classname}"
+
+# Instrumenting this class could cause double-counted HTTP metrics
+SkipClass: org.apache.coyote.tomcat5.CoyoteResponse
+
+
+##########################
+# WebOTX EJB skips
+#=========================
+SkipClassForFlag: com.nec.webotx.ejb.containers.EJBObjectInvocationHandler EJB2StubTracing
+SkipClassForFlag: com.nec.webotx.ejb.containers.EJBObjectImpl EJB2StubTracing
+SkipPackagePrefixForFlag: $Proxy EJB2StubTracing
+
+
+#######################
+# JMS Configuration 
+# ================
+
+SetFlag: JMSListenerTracing
+SetFlag: JMSConsumerTracing
+SetFlag: JMSPublisherTracing
+SetFlag: JMSSenderTracing
+
+
+#######################
+# Felix Osgi Configuration 
+# ================
+SetFlag: FelixOsgiTracing
+TurnOn: FelixOsgiTracing
+
+IdentifyClassAs: org.apache.felix.framework.Felix FelixOsgiTracing
+SetTracerClassMapping: FelixOsgiTracer com.wily.introscope.agent.osgi.bootdelegation.FelixOsgiBootdelegationHelper com.wily.introscope.probebuilder.validate.ResourceNameValidator
+
+TraceOneMethodWithParametersIfFlagged: FelixOsgiTracing createUnmodifiableMap FelixOsgiTracer "Felix"
+
+####################################################################
+# Configuration to skip dynamic and proxy classes for EJB (Session)
+# ==================================================================
+SkipMatchingClassesForFlag: *$$* SessionBeanTracing
+SkipMatchingClassesForFlag: *$Proxy* SessionBeanTracing
+
+SkipMatchingClassesForFlag: *$$* SessionBean3Tracing
+SkipMatchingClassesForFlag: *$Proxy* SessionBean3Tracing
+

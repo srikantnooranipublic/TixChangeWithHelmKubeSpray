@@ -1,0 +1,83 @@
+# -------------------  TixChange Web Config Map ------------------- #
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tix-web-apm-config
+  namespace: tixchange-v2
+
+data:
+  #
+  # Ticket Exchange Web App Env Variables
+  #
+  DB_HOST: tixchange-mysql-conn-svc-2
+  DB_PORT: "3306"
+  WS_HOST: authservice-svc 
+  WS_PORT: "8080"
+
+  RELEASE_VERSION: "1.0"
+  CATALINA_OPTS: " -DUSE.CASE.3=false -DUSE.CASE.4=false  -Djtixchange.ws.host=${WS_HOST} -Djtixchange.ws.port=${WS_PORT} -Djtixchange.ws.path=JTiXChange_Services"
+
+
+---
+
+# -------------------  TixChange WebService Config Map ------------------- #
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tix-ws-apm-config
+  namespace: tixchange-v2
+
+data:
+  #
+  # Ticket Exchange WebService App Env Variables
+  #
+  DB_HOST: tixchange-mysql-conn-svc-2
+  DB_PORT: "3306"
+
+  #
+  # APM Agent Env Variables
+  #
+  RELEASE_VERSION: "1.0"
+  CATALINA_OPTS: " -Xms128m -Xmx256m   -DUSE.CASE.1=true " 
+
+---
+
+# -------------------  TixChange Web property file ------------------- #
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-profile
+  namespace: tixchange-v2
+
+data:
+
+  #apmenv_introscope_agent_browseragent_snippetString: 'SNIPPET_STRING'
+  apmenv_introscope_agent_browseragent_autoInjection_default_snippetLocation: /opt/default.basnippet
+
+  apmenv_introscope_agent_browseragent_response_decoration_enabled: "true"
+  apmenv_introscope_agent_transactiontracer_sampling_perinterval_count: "6"
+
+  # Changing this property does not require restarting the Monitored Process
+  apmenv_introscope_agent_transactiontracer_sampling_interval_seconds: "60"
+  apmenv_introscope_agent_acc_enable: "false"
+  apmenv_introscope_agent_sockets_managed_reportToAppmap: "false"
+  apmenv_introscope_agent_sockets_managed_reportClassAppEdge: "false"
+  apmenv_introscope_agent_sockets_managed_reportMethodAppEdge: "false"
+  apmenv_introscope_agent_deep_entrypoint_enabled: "false"
+  apmenv_introscope_agent_defaultProcessName: "tomcat"
+  apmenv_introscope_agent_urlgroup_group_default_pathprefix: "*"
+  apmenv_introscope_agent_urlgroup_group_default_format: "{path_delimited:/:3:6}"
+  apmenv_introscope_agent_urlgroup_frontend_url_clamp: "50"
+  apmenv_introscope_agent_urlgroup_frontend_url_resources_list: "tif,js,tiff,jpg,jpeg,gif,png,bmp,bmpf,ico,cur,xbm,svg,img,css,woff,nil"
+  apmenv_introscope_agent_deep_automatic_trace_clamp: "25"
+  apmenv_introscope_agent_transactiontracer_sampling_enabled: "true"
+  apmenv_introscope_agent_transactiontracer_userid_method: "HttpSession.getValue"
+  apmenv_introscope_agent_transactiontracer_userid_key: "username"
+  apmenv_introscope_agent_errorsnapshots_identicalerror_period_time: "1"
+  apmenv_introscope_agent_sqlagent_sql_turnoffmetrics: "false"
+  apmenv_introscope_agent_sqlagent_sql_artonly: "false"
+  apmenv_introscope_agent_sqlagent_sql_turnofftrace: "false"
+  apmenv_introscope_agent_sqlagent_statement_clamp: "500"

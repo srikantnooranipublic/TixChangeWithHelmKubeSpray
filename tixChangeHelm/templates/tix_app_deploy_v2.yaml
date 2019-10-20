@@ -1,0 +1,224 @@
+# ------------------- TixChange Web App Deployment ------------------- #
+
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2. I'm running 1.11.0
+kind: Deployment
+metadata:
+  name: tix-web-deploy
+  namespace: tixchange-v2
+  labels:
+    app: tixchange-web
+    tier: frontend
+    env: {{ .Values.DeploymentEnv1 }}
+spec:
+  selector:
+    matchLabels:
+      app: tixchange-web
+      tier: frontend
+  replicas: 1 
+  revisionHistoryLimit: 9 # how many revisions
+  strategy:
+    rollingUpdate:
+      maxSurge: 1 # how many on top of replicas you want
+      maxUnavailable: 1 # how many you can afford to be down
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: tixchange-web
+        tier: frontend
+        env: {{ .Values.DeploymentEnv1 }}
+        apm: enabled
+      annotations:
+        ver: "1.0"
+    spec:
+      initContainers:
+        - name: init-myservice
+          image: busybox:1.28
+          command: ['sh', '-c','echo Init Web Init Container sleeping 20 sec; sleep 15;']
+      containers:
+        - name: tix-web
+          env:
+          - name: WEBAPP_HOME
+            value: /usr/local/tomcat/webapps/jtixchange_web
+          #- name: DB_HOST
+            #value: localhost 
+          #- name: DB_HOST
+            #value: localhost 
+          #- name: DB_PORT
+            #value: 3306 
+          #- name: WS_HOST
+            #value: localhost 
+          - name: LD_LIBRARY_PATH
+            value: /usr/local/tomcat/native-jni-lib
+          - name: TOMCAT_NATIVE_LIBDIR
+            value: /usr/local/tomcat/native-jni-lib
+          - name: CATALINA_HOME
+            value: /usr/local/tomcat
+{{- if .Values.RenameAgentHostname }}
+          - name: apmenv_introscope_agent_hostName
+            value: TxChangeWeb_UC2
+{{ end }}
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "2000Mi"
+            requests:
+              cpu: "600m"
+              memory: "600Mi"
+          #image: omaro/tixchange_web:2.1
+          image: srikns/tixchange-web8
+          lifecycle:
+            postStart: 
+              exec:
+                command: [ 'sh', '-c', 'sleep 60; cp -f /opt/temp/j2ee.pbd /opt/wily/core/config/j2ee.pbd; chmod 777 /opt/wily/core/config/j2ee.pbd;']
+          #imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: tix-web-apm-config 
+            - configMapRef:
+                name: agent-profile
+          volumeMounts:
+            - name: ba-snippet
+              mountPath: /opt/default.basnippet
+              subPath: default.basnippet2
+              readOnly: true
+            - name: j2ee-pbd
+              mountPath: /opt/temp/j2ee.pbd
+              subPath: j2ee.pbd
+              readOnly: true
+            - name: jtixchange-pbd
+              mountPath: /opt/wily/core/config/hotdeploy/jtixchange.pbd
+              subPath: jtixchange.pbd
+              readOnly: true
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: ba-snippet
+          configMap:
+            name: default-basnippet
+        - name: j2ee-pbd
+          configMap:
+            name: j2ee-pbd
+        - name: jtixchange-pbd
+          configMap:
+            name: jtixchange-pbd
+          #hostPath:
+            #path: /opt/ca/TixChangeK8sDemo/tixChangeHelm/default.basnippet
+      nodeSelector:
+        kubernetes.io/hostname: node3
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webportal-svc
+  namespace: tixchange-v2
+  labels:
+    app: tixchange-web
+    tier: frontend
+spec:
+  selector:
+    app: tixchange-web 
+    tier: frontend 
+  ports:
+  - port: 8080 
+    name: web
+    targetPort: 8080
+
+---
+
+
+# ------------------- TixChange WebServices Deployment ------------------- #
+
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2. I'm running 1.11.0
+kind: Deployment
+metadata:
+  name: tix-ws-deploy
+  namespace: tixchange-v2
+  labels:
+    app: tixchange-ws
+    tier: backend
+    env: {{ .Values.DeploymentEnv1 }}
+spec:
+  selector:
+    matchLabels:
+      app: tixchange-ws
+      tier: backend
+  replicas: 1
+  revisionHistoryLimit: 9
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: tixchange-ws
+        tier: backend
+        env: {{ .Values.DeploymentEnv1 }}
+        apm: enabled
+      annotations:
+        ver: "1.0"
+    spec:
+      initContainers:
+        - name: init-myservice
+          image: busybox:1.28
+          command: ['sh', '-c','echo Init Service Init Container sleeping 15 sec; sleep 15;']
+      containers:
+        - name: tix-ws
+          env:
+          - name: WEBAPP_HOME
+            value: /usr/local/tomcat/webapps/JTiXChange_Services
+          #- name: DB_HOST
+            #value: localhost
+          #- name: DB_HOST
+            #value: localhost
+          #- name: DB_PORT
+            #value: 3306
+          - name: WS_HOST
+            value: localhost
+          - name: LD_LIBRARY_PATH
+            value: /usr/local/tomcat/native-jni-lib
+          - name: TOMCAT_NATIVE_LIBDIR
+            value: /usr/local/tomcat/native-jni-lib
+          - name: CATALINA_HOME
+            value: /usr/local/tomcat
+{{- if .Values.RenameAgentHostname }}
+          - name: apmenv_introscope_agent_hostName
+            value: TxChangeSvc_UC2
+{{ end }}
+          resources:
+            limits:
+              cpu: "900m"
+              memory: "900Mi"
+            requests:
+              cpu: "500m"
+              memory: "500Mi"
+          image: srikns/tixchange-service8
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: tix-ws-apm-config
+          ports:
+            - containerPort: 8080
+
+      nodeSelector:
+        kubernetes.io/hostname: node1
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: authservice-svc
+  namespace: tixchange-v2
+  labels:
+    app: tixchange-ws
+    tier: backend
+spec:
+  selector:
+    app: tixchange-ws 
+    tier: backend 
+  ports:
+  - port: 8080 
+    targetPort: 8080
+

@@ -1,0 +1,213 @@
+# DaemonSet Configuration
+# Agent from Container1 will be reported to <Node_Name>|Infrastructure|Agent
+# Agent from Container2 will be reported to <Node_Name>|Application|JMX Agent
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: app-container-monitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    tier: monitoring
+    app: cagent
+
+
+spec:
+  # oc adm policy add-scc-to-user privileged -z default
+  template:
+    metadata:
+      labels:
+        app: caagent
+      annotations:
+        ca.broadcom.application.name: container-monitoring
+    spec:
+      hostPID: true
+      hostIPC: true
+      hostNetwork: true
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      containers:
+      - env:
+        - name: containerflow
+          value: enabled
+        - name: apmenv_log4j_logger_IntroscopeAgent
+          value: "DEBUG,logfile"
+        - name: apmenv_autoattach_docker_free_memory_threshold
+          value: "15.00"
+        - name: agentManager_url_1
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_url_1
+              name: caaiops-config-common
+{{- if .Values.agentManager_credential }}
+        - name: agentManager_credential
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_credential
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_host }}
+        - name: apmenv_agentManager_httpProxy_host
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_host
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_port }}
+        - name: apmenv_agentManager_httpProxy_port
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_port
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_username }}
+        - name: apmenv_agentManager_httpProxy_username
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_username
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_password }}
+        - name: apmenv_agentManager_httpProxy_password
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_password
+              name: caaiops-config-common
+{{ end }}
+
+        - name: type
+          value: {{ .Values.type }}
+        - name: interval
+          value: "60"
+        - name: apmenv_introscope_agent_extensions_bundles_load
+          value: {{ if or .Values.autoattach_enabled }} AutoAttach,{{end}}{{ if and .Values.kubernetes_monitor_enabled }}OpenshiftMonitor,HostMonitor,{{end}}KubernetesRemoteMonitor
+        ###Enable Node Exporter####- name: apmenv_introscope_agent_extensions_bundles_load
+          ###Enable Node Exporter####value: {{ if or .Values.autoattach_enabled }} AutoAttach,{{end}}{{ if and .Values.kubernetes_monitor_enabled }}OpenshiftMonitor,HostMonitor,{{end}}{{ if or .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled .Values.kubernetes_remote_jmx_enabled }}KubernetesRemoteMonitor,{{end}}
+{{- if or .Values.autoattach_enabled }}
+        ##########################
+        # Auto Attach properties:
+        ##########################
+        - name: apmenv_autoattach_enable_agentNameSuffix
+          value: "false"
+        - name: apmenv_autoattach_enabled_applications
+          value: " "
+        # Operation Mode for Auto Attach (whitelist/blacklist).
+        # whitelist: will only attach to processes marked with env variable CA_APM_MONITORING_ENABLED=true
+        # blacklist: will attach to all processes except those marked with env variable CA_APM_MONITORING_ENABLED=false
+        - name: apmenv_autoattach_filter_type
+          value: "{{ default "whitelist" .Values.autoattach_filter_type }}"
+        # Properties for aggressively monitoring every JVM
+        - name: apmenv_autoattach_proactiveMode_enabled
+          value: "true"
+        - name: apmenv_autoattach_proactiveMode_vmpattern
+          value: "java"
+        - name: apmenv_autoattach_proactiveMode_agent_directory
+          value: "/usr/local/openshift/apmia/java-agent/wily"
+        - name: apmenv_autoattach_proactiveMode_agent_profile
+          value: "IntroscopeAgentMicro.profile"
+{{- if and .Values.autoattach_agent_extra_properties }}
+        - name: apmenv_autoattach_proactiveMode_agent_extra_properties
+          value: {{ .Values.autoattach_agent_extra_properties }}
+{{ end }}
+
+
+{{end}}
+{{- if or .Values.kubernetes_remote_jmx_enabled  .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled }}
+        - name: apmenv_com_ca_apm_kubernetes_remote_monitor_type
+          value: prometheus
+          ###Enable Node Exporter###value: {{ if or .Values.kubernetes_remote_jmx_enabled }}jmx,{{end}}{{ if and .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled (not .Values.kubernetes_monitor_enabled) }}prometheus{{end}}
+        - name: apmenv_com_ca_apm_kubernetes_clusterName
+          valueFrom:
+            configMapKeyRef:
+              key: cluster_name
+              name: caaiops-config-common
+        - name: apmenv_com_ca_apm_kubernetes_autodiscovery_local
+          value: "true"
+        - name: nodename
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+{{end}}
+{{- if or .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled }}
+        - name: apmenv_com_ca_apm_kubernetes_prometheus_datafile
+          value: node-exporter
+          ###Enable Node Exporter###value: node-exporter, cadvisor
+{{end}}
+        - name: apmenv_introscope_agent_customProcessName
+          valueFrom:
+            configMapKeyRef:
+              key: cluster_name
+              name: caaiops-config-common
+        - name: apmenv_introscope_agent_agentName
+          value: Kubernetes Agent
+        - name: MIN_HEAP_VAL_IN_MB
+          value: "64"
+        name: podmonitor
+        image:  {{ .Values.image }}
+{{- if .Values.kubernetes_resource_bound }}
+        resources:
+          limits:
+            cpu: 2
+            memory: 1G
+          requests:
+            cpu: 200m
+            memory: 300Mi
+{{end}}
+{{- if and .Values.kubernetes_monitor_enabled (not .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled) }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - "if (( $(expr `date +%s` - `stat -c %Y /tmp/apmia-health/extensions/Docker-health.txt`) > 120 )); then exit 1; fi"
+          initialDelaySeconds: 120
+{{end}}
+{{- if .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - "if (( $(expr `date +%s` - `stat -c %Y /tmp/apmia-health/extensions/prometheus-health.txt`) > 120 )); then exit 1; fi"
+          initialDelaySeconds: 120
+{{end}}
+        imagePullPolicy: Always
+        #        resources:
+        #          limits:
+        #            cpu: 500m
+        #            memory: 700Mi
+        #          requests:
+        #            cpu: 200m
+        #            memory: 300Mi
+        securityContext:
+          privileged: true
+
+
+
+        volumeMounts:
+        - name: dockersock
+          mountPath: /var/run/docker.sock
+          readOnly: true
+        - name: proc
+          mountPath: /host/proc
+          readOnly: true
+{{- if  .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled }}
+        - name: config-volume
+          mountPath: /usr/local/openshift/apmia/extensions/KubernetesRemoteMonitor/config/prometheus
+{{end}}
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock
+      - name: proc
+        hostPath:
+          path: /proc
+{{- if  .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled }}
+      - name: config-volume
+        configMap:
+          name: caaiops-config-prometheus
+{{end}}
+
+selector:
+    matchLabels:
+      app: caagent

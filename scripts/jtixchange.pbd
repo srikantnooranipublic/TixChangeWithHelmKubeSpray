@@ -1,0 +1,43 @@
+TurnOn: jtixchange_persistence_all
+SetFlag: jtixchange_persistence_all
+
+IdentifyMatchingClassesAs: "com.jtixchange.persistence.*" jtixchange_persistence_all
+
+TraceComplexMethodsIfFlagged: jtixchange_persistence_all BlamePointTracer "JTiXChange|Persistence|{classname}|{method}"
+TraceComplexMethodsWithParametersIfFlagged: jtixchange_persistence_all ExceptionErrorReporter "JTiXChange|Persistence|{classname}|{method}:Errors Per Interval"
+
+
+TurnOn: jtixchange_service_all
+SetFlag: jtixchange_service_all
+
+IdentifyMatchingClassesAs: "com.jtixchange.service.*" jtixchange_service_all
+
+TraceComplexMethodsIfFlagged: jtixchange_service_all BlamePointTracer "JTiXChange|Service|{classname}|{method}"
+TraceComplexMethodsWithParametersIfFlagged: jtixchange_service_all ExceptionErrorReporter "JTiXChange|Service|{classname}|{method}:Errors Per Interval"
+
+
+TurnOn: jtixchange_action_all
+SetFlag: jtixchange_action_all
+IdentifyMatchingClassesAs: "com.jtixchange.presentation.*" jtixchange_action_all
+
+TraceComplexMethodsIfFlagged: jtixchange_action_all BlamePointTracer "JTiXChange|Action|{classname}|{method}"
+TraceComplexMethodsWithParametersIfFlagged: jtixchange_action_all ExceptionErrorReporter "JTiXChange|Action|{classname}|{method}:Errors Per Interval"
+
+
+## Object Instance Count
+
+#TurnOn: intance_count_all
+SetFlag: intance_count_all
+
+IdentifyMatchingClassesAs: com.jtixchange.*  intance_count_all
+IdentifyFlagAs: intance_count_all  InstanceCounts
+
+
+#SkipPackage: sun.io
+SkipClass: com.sun.jersey.spi.container.servlet.ServletContainer
+
+#########################################################
+# Do not process Servlet handling static files
+#
+#SkipClass: org.apache.catalina.servlets.DefaultServlet
+SetTracerParameter: HttpServletTracer  is.frontend.unless org.apache.catalina.servlets.DefaultServlet

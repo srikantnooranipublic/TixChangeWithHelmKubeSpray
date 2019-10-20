@@ -1,0 +1,61 @@
+# ------------------- TixChange APMIA MySQL Deployment ------------------- #
+
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: tix-apmia-mysql-deploy
+  namespace: tixchange-v2
+  labels:
+    app: tixchange-apmia
+    tier: database
+    env: {{ .Values.DeploymentEnv1 }}
+spec:
+  selector:
+    matchLabels:
+      app: tixchange-apmia
+      tier: database
+      env: {{ .Values.DeploymentEnv1 }}
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: tixchange-apmia
+        tier: database
+        env: {{ .Values.DeploymentEnv1 }}
+      annotations:
+        ver: "1.0"
+    spec:
+      #hostAliases:
+      #- ip: "127.0.0.1"
+        #hostnames:
+        #- "tixchange-mysql-conn-svc-1"
+      containers:
+        - resources:
+          env:
+            - name: apmenv_introscope_agent_defaultProcessName
+              value: apmiaMySQL_UC2
+            - name: apmenv_introscope_agent_hostName
+              value: node2
+            - name: APMENV_AGENTMANAGER_URL_1
+              value: "APM_MANAGER_URL_1"
+            - name: APMENV_AGENTMANAGER_CREDENTIAL
+              value: "APM_MANAGER_CREDENTIAL"
+            - name: apmenv_db1_hostName
+              value: "tixchange-mysql-conn-svc-2"
+          name: apmia-mysql-uc1
+          image: srikns/apmiamysql:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "0.7"
+              memory: 700M
+
+      nodeSelector:
+        kubernetes.io/hostname: node2
+      #nodeSelector:
+        #nodeNum: "01"
+
+
+

@@ -1,0 +1,89 @@
+# Agent connection properties Agent will connect to Enterprise Manager
+# Changing this property requires restarting the Monitored Process
+
+agentManager_url_1: https://apm-em
+
+agentManager_credential:
+
+# Name for the Kubernetes Cluster.
+cluster_name: KubernetesUMA
+
+# Indicates wheather dynamic Java Agent attach (Auto Attch) feature is turned on or not
+# Change this to false in case you want to turn off this feature
+autoattach_enabled: true
+
+# Operation Mode for Auto Attach .
+# Possible values : whitelist or blacklist
+# whitelist: will only attach to processes marked with env variable CA_APM_MONITORING_ENABLED=true
+# blacklist: will attach to all processes except those marked with env variable CA_APM_MONITORING_ENABLED=false
+
+autoattach_filter_type: blacklist
+
+# Comma Separated list of IntroscopeAgent profile properties that you would like to
+# send as part of Auto Attach Configuration
+# For eg.
+#  autoattach_agent_extra_properties: introscope.agent.defaultProcessName=tomcat,introscope.agent.agentAutoNamingEnabled=false
+autoattach_agent_extra_properties: introscope.agent.defaultProcessName=tomcat,introscope.agent.agentAutoNamingEnabled=true,introscope.agent.external.biz.enabled=true,introscope.agent.browseragent.autoInjectionEnabled=true
+#,introscope.agent.browseragent.autoInjection.default.snippetLocation=/opt/wily/core/config/default.basnippet1
+
+# Indicates wheather Kubernetes Remote JMX Agent feature is turned on or not
+# Change this to false in case you want to turn off this feature
+kubernetes_remote_jmx_enabled: true
+
+# Indicates wheather Kubernetes Node and cluster Monitor feature is turned on or not
+# This feature does not need any software to be pre-installed in the Kubernetes Cluster
+# Change this to false in case you want to turn off this feature
+# You need to explicitly set the value to false in case you want to monitor Node and Container through
+# Prometheus exporters
+
+kubernetes_monitor_enabled: true
+
+# Indicates wheather Kubernetes Node and Container monitor Through Prometheus Exporters feature
+# is turned on or not
+# In order to use this feature, you need to have cAdvisor and node Prometheus exporters already installed.
+# Before enabling this property, make sure kubernetes_monitor_enabled is set to false.
+
+kubernetes_monitor_node_container_prometheus_exporters_enabled: true
+
+# Indicates wheather Kubernetes Service Monitor through Prometheus Exporters feature
+# is turned on or not
+# In order to use this feature, you need to have haproxy, coredns or kube-state-metrics exporters already installed
+
+kubernetes_monitor_cluster_prometheus_exporters_enabled: true
+
+# Indicates whether each deployment will be limited to cpu and memory resource or not
+# For Production use, this should be set to true
+
+kubernetes_resource_bound: true
+
+# Name of the image
+
+image: caapm/universalmonitoragent:latest
+
+# Type of the Kubernetes Deployment. In case of Openshift, change this to Openshift
+type: Kubernetes
+
+# HttpProxy connection properties The agentManager.httpProxy properties are used
+# only when the Agent is tunneling over HTTP and the Agent must connect to the
+# Enterprise Manager through a proxy server (forward proxy). Uncomment and set
+# the appropriate proxy host and port values. If the proxy server cannot be
+# reached at the specified host and port, the Agent will try a direct HTTP
+# tunneled connection to the Enterprise Manager before failing the connection
+# attempt.
+#
+# Changing this property requires restarting the Monitored Process
+#agentManager_httpProxy_host:
+
+# Changing this property requires restarting the Monitored Process
+#agentManager_httpProxy_port:
+
+# The following properties are used only when the proxy server requires
+# authentication. Uncomment and set the user name and password properties. For
+# NTLM credentials you must separate domain name from user name by escaped
+# backslash e.g. mydomain.com\\jack01
+#
+# Changing this property requires restarting the Monitored Process
+#agentManager_httpProxy_username:
+
+# Changing this property requires restarting the Monitored Process
+#agentManager_httpProxy_password:

@@ -1,0 +1,72 @@
+runTrxnTrace () {
+  curl -k -s -X POST \
+  APM_SAAS_URL/apm/appmap/private/agentlist/starttrace \
+  -H 'Accept: */*' \
+  -H 'Authorization: Bearer APM_API_TOKEN' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/json' \
+  -H 'accept-encoding: gzip, deflate' \
+  -H 'cache-control: no-cache' \
+  -H 'cookie: e63bcb68cc073a55f8914752561ebe6d=5d1e65f2b1552e35f8ea89735b7f5a13' \
+  -d '{
+  "minTraceDuration": 3000,
+  "traceSessionDuration": 90000,
+  "agentList": [
+    "SuperDomain|Experience Collector Host|DxC Agent|Logstash-APM-Plugin",
+    "SuperDomain|TxChangeWeb_UC1|tomcat|Agent",
+    "SuperDomain|TxChangeSvc_UC1|tomcat|Agent",
+    "SuperDomain|TxChangeWeb_UC2|tomcat|Agent",
+    "SuperDomain|TxChangeSvc_UC2|tomcat|Agent"
+  ]
+}'
+}
+
+
+EXECUTED=true
+BASE_MINUTES=30
+RANDOMIZER=15
+
+while true; do
+
+  echo "running normal UC1"
+  selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSelenium.side 
+sleep 2
+  echo "running normal UC2"
+  selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc2.jtixchange.com/ ./TixChangeSelenium.side 
+sleep 2 
+
+
+  CURRENT_MINUTES=`date +%M`
+
+  if [ $EXECUTED == "true" ]; then
+	
+    RAND=`echo $((1 + RANDOM % $RANDOMIZER ))`
+    RAND_MINUTES=`echo $(( $RAND + $BASE_MINUTES ))`
+
+    EXECUTED=false
+  fi
+
+  echo "Current Minutes=$CURRENT_MINUTES, UC execution at $RAND_MINUTES"
+
+  # Trigger Slow Login every hour top of the hour
+  if [ $CURRENT_MINUTES -eq $RAND_MINUTES ]; then
+
+   EXECUTED=true
+
+   echo "starting TT at `date`"
+    
+    runTrxnTrace
+    sleep 5
+
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+sleep 2
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+    sleep 5
+  fi 
+
+done
+
+

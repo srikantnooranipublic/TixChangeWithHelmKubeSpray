@@ -1,0 +1,79 @@
+# ------------------- TixChange MySQL Deployment ------------------- #
+
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: tix-mysql-deploy
+  namespace: tixchange-v2
+  labels:
+    app: tixchange-db
+    tier: database
+    env: {{ .Values.DeploymentEnv1 }}
+spec:
+  selector:
+    matchLabels:
+      app: tixchange-db
+      tier: database
+      env: {{ .Values.DeploymentEnv1 }}
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: tixchange-db
+        tier: database
+        env: {{ .Values.DeploymentEnv1 }}
+      annotations:
+        ver: "1.0"
+    spec:
+      #hostAliases:
+      #- ip: "127.0.0.1"
+        #hostnames:
+        #- "tixchange-mysql-conn-svc-1"
+      containers:
+        - name: tix-mysql
+          image: srikns/tixchange-mysql8:latest
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: CAdemo123
+          - name: MYSQL_DATABASE
+            value: jtixchange
+          - name: MYSQL_USER
+            value: tcuser
+          - name: MYSQL_PASSWORD
+            value: quality
+          -  name: Zone
+             value: "us-east-1c"
+          ports:
+            - name: db-port
+              containerPort: 3306
+
+      nodeSelector:
+        kubernetes.io/hostname: node2
+      #nodeSelector:
+        #nodeNum: "01"
+
+---
+
+
+# -------------------  MySQL Service ------------------- #
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tixchange-mysql-conn-svc-2
+  namespace: tixchange-v2
+  labels:
+    app: tixchange-db
+    tier: database
+spec:
+  selector:
+    app: tixchange-db 
+    tier: database
+  ports:
+  - name: mysql-port
+    port: 3306
+    targetPort: 3306
+

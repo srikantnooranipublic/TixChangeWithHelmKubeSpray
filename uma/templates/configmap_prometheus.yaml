@@ -1,0 +1,121 @@
+{{- if or .Values.kubernetes_monitor_cluster_prometheus_exporters_enabled .Values.kubernetes_monitor_node_container_prometheus_exporters_enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: caaiops-config-prometheus
+  namespace: {{ .Release.Namespace }}
+
+data:
+  kubernetes_remote_monitoring_bundles_load: KubernetesRemoteMonitor
+  default.properties: |
+    prometheus.metric.sets: set1
+    prometheus.metric.set1.metric_list:
+    prometheus.metric.set1.apm_metric_path:
+    prometheus.metric.set1.apm_metric_type: LongFluctuating
+    prometheus.metric.set1.aggregation_type: sum
+    additional.label.sets:
+  cadvisor.properties: |
+    prometheus.metric.sets:set1,set2
+    prometheus.metric.set1.metric_list: container_cpu_usage_seconds_total,container_spec_cpu_quota,container_spec_cpu_period,container_cpu_usage_seconds_total,container_cpu_cfs_throttled_seconds_total,container_memory_working_set_bytes,container_memory_max_usage_bytes,container_memory_failcnt,container_fs_writes_bytes_total,container_fs_reads_bytes_total,container_network_receive_bytes_total,container_network_transmit_bytes_total,container_network_receive_packets_dropped_total,container_network_transmit_packets_dropped_total
+    prometheus.metric.set1.apm_metric_path: {{ .Values.type }}|Namespaces|(aiops_namespace)|Pods|(aiops_pod)|Containers|(aiops_container), {{ .Values.type }}|Namespaces|(aiops_namespace)|Pods|(aiops_pod)
+    prometheus.metric.set1.apm_metric_type: LongFluctuating
+    prometheus.metric.set1.aggregation_type: sum
+    prometheus.metric.set2.metric_list: container_spec_memory_limit_bytes
+    prometheus.metric.set2.apm_metric_path: {{ .Values.type }}|Namespaces|(aiops_namespace)|Pods|(aiops_pod)|Containers|(aiops_container):container_memory_max_usage_bytes, {{ .Values.type }}|Namespaces|(aiops_namespace)|Pods|(aiops_pod):container_memory_max_usage_bytes
+    prometheus.metric.set2.apm_metric_type: LongFluctuating
+    prometheus.metric.set2.aggregation_type: sum
+    additional.label.sets: set1, set2, set3, set4, set5, set6
+    additional.label.set1.source_label: namespace
+    additional.label.set1.target_label: aiops_namespace
+    additional.label.set2.source_label: pod_name
+    additional.label.set2.target_label: aiops_pod
+
+    additional.label.set3.source_label: container_name
+    additional.label.set3.target_label: aiops_container
+    additional.label.set4.source_label: container_label_io_kubernetes_pod_namespace
+    additional.label.set4.target_label: aiops_namespace
+    additional.label.set5.source_label: container_label_io_kubernetes_pod_name
+    additional.label.set5.target_label: aiops_pod
+    additional.label.set6.source_label: container_label_io_kubernetes_container_name
+    additional.label.set6.target_label: aiops_container
+
+
+  node-exporter.properties: |
+    prometheus.metric.sets: cpu,cpuload,memavailable,memtotal,diskreadwrite,filesystemfree,filesystemsize,network
+    prometheus.metric.cpu.metric_list: node_cpu_seconds_total
+    prometheus.metric.cpu.apm_metric_path: Prometheus|(node_name)|CPU:total_(aiops_mode)_node_cpu_seconds_total,Prometheus|(node_name)|CPU|Core(aiops_cpu):(aiops_mode)_node_cpu_seconds_total
+    prometheus.metric.cpu.apm_metric_type:LongFluctuating
+    prometheus.metric.cpu.aggregation_type:sum
+    prometheus.metric.cpuload.metric_list:node_load1
+    prometheus.metric.cpuload.apm_metric_path:Prometheus|(node_name)|CPU
+    prometheus.metric.memavailable.metric_list:node_memory_MemAvailable_bytes, node_memory_MemAvailable
+    prometheus.metric.memavailable.apm_metric_path:Prometheus|(node_name)|Memory:node_memory_MemAvailable_bytes
+    prometheus.metric.memtotal.metric_list:node_memory_MemTotal_bytes,node_memory_MemTotal
+    prometheus.metric.memtotal.apm_metric_path:Prometheus|(node_name)|Memory:node_memory_MemTotal_bytes
+    prometheus.metric.diskreadwrite.metric_list:node_disk_written_bytes_total,node_disk_read_bytes_total
+    prometheus.metric.diskreadwrite.apm_metric_path:Prometheus|(node_name)|Storage
+    prometheus.metric.filesystemfree.metric_list:node_filesystem_free_bytes
+    prometheus.metric.filesystemfree.apm_metric_path:Prometheus|(node_name)|Storage:(aiops_device)_node_filesystem_free_bytes, Prometheus|(node_name)|Storage|(aiops_device)|(mountpoint)
+    prometheus.metric.filesystemsize.metric_list:node_filesystem_size_bytes
+    prometheus.metric.filesystemsize.apm_metric_path:Prometheus|(node_name)|Storage:(aiops_device)_node_filesystem_size_bytes, Prometheus|(node_name)|Storage|(aiops_device)|(mountpoint)
+    prometheus.metric.network.metric_list:node_network_receive_bytes_total, node_network_transmit_bytes_total, node_network_receive_drop_total, node_network_transmit_drop_total, node_network_transmit_errs_total, node_network_receive_errs_total
+    prometheus.metric.network.apm_metric_path:Prometheus|(node_name)|Network, Prometheus|(node_name)|Network|(aiops_device)
+    additional.label.sets:set1, set2, set3, set4
+    additional.label.set1.source_label:device
+    additional.label.set1.target_label:aiops_device
+    additional.label.set2.source_label:cpu
+    additional.label.set2.target_label:aiops_cpu
+    additional.label.set3.source_label:mode
+    additional.label.set3.target_label:aiops_mode
+  kube-state-metric.properties: |
+    prometheus.metric.sets=node_status,pod_status,unschedulable_node,container_status, container_waiting_reason,node_allocatable_capacity, daemonset1,daemonset2, deployments1, deployments2
+    prometheus.metric.node_status.metric_list=kube_node_status_condition
+    prometheus.metric.node_status.apm_metric_path={{ .Values.type }}|Nodes:kube_node_status_condition_(condition)_(status), {{ .Values.type }}|Nodes|(node):kube_node_status_condition_(condition)_(status)
+    prometheus.metric.pod_status.metric_list=kube_pod_status_phase
+    prometheus.metric.pod_status.apm_metric_path={{ .Values.type }}|Namespaces:kube_pod_status_phase_(phase), {{ .Values.type }}|Namespaces|(namespace):kube_pod_status_phase_(phase)
+    prometheus.metric.unschedulable_node.metric_list=kube_node_spec_unschedulable
+    prometheus.metric.unschedulable_node.apm_metric_path={{ .Values.type }}|Nodes, {{ .Values.type }}|Nodes|(node)
+    prometheus.metric.container_status.metric_list=kube_pod_container_status_running, kube_pod_container_status_terminated, kube_pod_container_status_waiting
+    prometheus.metric.container_status.apm_metric_path={{ .Values.type }}|Namespaces, {{ .Values.type }}|Namespaces|(namespace)
+    prometheus.metric.container_waiting_reason.metric_list=kube_pod_container_status_waiting_reason
+    prometheus.metric.container_waiting_reason.apm_metric_path={{ .Values.type }}|Namespaces|(namespace)|kube_pod_container_status_waiting_reason:(reason)
+    prometheus.metric.node_allocatable_capacity.metric_list=kube_node_status_allocatable_cpu_cores, kube_node_status_capacity_cpu_cores, kube_node_status_allocatable_memory_bytes , kube_node_status_capacity_memory_bytes, kube_node_status_allocatable_pods, kube_node_status_capacity_pods
+    prometheus.metric.node_allocatable_capacity.apm_metric_path={{ .Values.type }}|Nodes, {{ .Values.type }}|Nodes|(node)
+    prometheus.metric.daemonset1.metric_list=kube_daemonset_status_number_unavailable, kube_daemonset_status_desired_number_scheduled, kube_daemonset_status_number_available, kube_daemonset_updated_number_scheduled
+    prometheus.metric.daemonset1.apm_metric_path={{ .Values.type }}|Namespaces|(namespace), {{ .Values.type }}|Namespaces|(namespace)|kube_daemonset|(daemonset)
+    prometheus.metric.daemonset2.metric_list=kube_daemonset_status_number_misscheduled, kube_daemonset_status_current_number_scheduled, kube_daemonset_status_number_ready
+    prometheus.metric.daemonset2.apm_metric_path={{ .Values.type }}|Namespaces, {{ .Values.type }}|Namespaces|(namespace), {{ .Values.type }}|Namespaces|(namespace)|kube_daemonset|(daemonset)
+    prometheus.metric.deployments1.metric_list=kube_deployment_status_replicas, kube_deployment_status_replicas_available, kube_deployment_status_replicas_unavailable
+    prometheus.metric.deployments1.apm_metric_path={{ .Values.type }}|Namespaces, {{ .Values.type }}|Namespaces|(namespace), {{ .Values.type }}|Namespaces|(namespace)|kube_deployment|(deployment)
+    prometheus.metric.deployments2.metric_list=kube_deployment_status_replicas_updated, kube_deployment_status_observed_generation, kube_deployment_spec_replicas, kube_deployment_spec_paused
+    prometheus.metric.deployments2.apm_metric_path={{ .Values.type }}|Namespaces|(namespace), {{ .Values.type }}|Namespaces|(namespace)|kube_deployment|(deployment)
+
+  haproxy.properties: |
+    prometheus.metric.sets:frontend, backend, server
+    prometheus.metric.backend.metric_list:haproxy_backend_connections_total, haproxy_backend_current_queue, haproxy_backend_up
+    prometheus.metric.backend.apm_metric_path:{{ .Values.type }}|HAProxyRouter|Backends|(backend)
+    prometheus.metric.frontend.metric_list:haproxy_frontend_bytes_in_total,haproxy_frontend_max_sessions
+    prometheus.metric.frontend.apm_metric_path:{{ .Values.type }}|HAProxyRouter|Frontends|(frontend)
+    prometheus.metric.server.metric_list:haproxy_server_bytes_out_total, haproxy_server_check_failures_total, haproxy_server_connection_errors_total, haproxy_server_connections_total, haproxy_server_current_queue, haproxy_server_current_session_rate, haproxy_server_current_sessions, haproxy_server_downtime_seconds_total, haproxy_server_http_average_response_latency_milliseconds, haproxy_server_http_responses_total, haproxy_server_max_session_rate, haproxy_server_up, haproxy_server_response_errors_total
+    prometheus.metric.server.apm_metric_path:{{ .Values.type }}|HAProxyRouter|Projects|(namespace)|Services|(service)|Pods|(pod)
+
+  coredns.properties: |
+    prometheus.metric.sets=build,cache,counter,request,response,forward,panic
+    prometheus.metric.build.metric_list=coredns_build_info
+    prometheus.metric.build.apm_metric_path={{ .Values.type }}|Coredns|Build_info|(goversion)|Revision|(revision)|Version|(version)
+    prometheus.metric.cache.metric_list=coredns_cache_misses_total
+    prometheus.metric.cache.apm_metric_path={{ .Values.type }}|Coredns|Cache|Server|(server)
+    prometheus.metric.counter.metric_list=coredns_dns_request_count_total
+    prometheus.metric.counter.apm_metric_path={{ .Values.type }}|Coredns|Request|Family|(proto)|Server|(server)|zone-(zone)
+    prometheus.metric.request.metric_list=coredns_dns_request_type_count_total
+    prometheus.metric.request.apm_metric_path={{ .Values.type }}|Coredns|Request|Server|(server)|Query_type|(type)|Zone-(zone)
+    prometheus.metric.response.metric_list=coredns_dns_response_rcode_count_total
+    prometheus.metric.response.apm_metric_path={{ .Values.type }}|Coredns|Response|(rcode)|Server|(server)|Zone-(zone)
+    prometheus.metric.forward.metric_list=coredns_forward_healthcheck_failure_count_total,coredns_forward_sockets_open
+    prometheus.metric.forward.apm_metric_path={{ .Values.type }}|Coredns|Forward|Destination_IP|(to)
+    prometheus.metric.panic.metric_list=coredns_panic_count_total
+    prometheus.metric.panic.apm_metric_path={{ .Values.type }}|Coredns
+    additional.label.sets=set1
+    additional.label.set1.source_label=family
+    additional.label.set1.target_label=Family
+{{end}}

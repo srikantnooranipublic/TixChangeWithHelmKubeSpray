@@ -1,0 +1,12 @@
+# Service for Cluster Discovery
+apiVersion: v1
+kind: Service
+metadata:
+  name: clusterinfo
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    module: clusterinfo
+  ports:
+  - port: 8080
+  type: ClusterIP

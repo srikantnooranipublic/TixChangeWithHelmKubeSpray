@@ -1,0 +1,126 @@
+{{- if or .Values.kubernetes_monitor_cluster_prometheus_exporters_enabled }}
+# Prometheus based Deployment. What is the Agent triplet name ?
+# Agent from Container1 will be reported to <Cluster_Name>|ClusterMonitoring|Prometheus Agent
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cluster-service-monitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: prometheus-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: prometheus-deployment
+      labels:
+        app: prometheus-deployment
+    spec:
+      containers:
+      - env:
+        - name: agentManager_url_1
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_url_1
+              name: caaiops-config-common
+{{- if .Values.agentManager_credential }}
+        - name: agentManager_credential
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_credential
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_host }}
+        - name: apmenv_agentManager_httpProxy_host
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_host
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_port }}
+        - name: apmenv_agentManager_httpProxy_port
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_port
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_username }}
+        - name: apmenv_agentManager_httpProxy_username
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_username
+              name: caaiops-config-common
+{{ end }}
+{{- if .Values.agentManager_httpProxy_password }}
+        - name: apmenv_agentManager_httpProxy_password
+          valueFrom:
+            configMapKeyRef:
+              key: agentManager_httpProxy_password
+              name: caaiops-config-common
+{{ end }}
+        - name: apmenv_introscope_agent_extensions_bundles_load
+          valueFrom:
+            configMapKeyRef:
+              key: kubernetes_remote_monitoring_bundles_load
+              name: caaiops-config-prometheus
+        - name: apmenv_com_ca_apm_kubernetes_remote_monitor_type
+          value: prometheus
+        - name: apmenv_com_ca_apm_kubernetes_prometheus_datafile
+          value: haproxy,kube-state-metric,coredns
+        - name: apmenv_introscope_agent_agentName
+          value: Infrastructure Agent
+        - name: apmenv_introscope_agent_hostName
+          valueFrom:
+            configMapKeyRef:
+              key: cluster_name
+              name: caaiops-config-common
+        - name: apmenv_introscope_agent_customProcessName
+          value: ClusterServiceMonitor
+        - name: apmenv_com_ca_apm_kubernetes_clusterName
+          valueFrom:
+            configMapKeyRef:
+              key: cluster_name
+              name: caaiops-config-common
+        - name: nodename
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: apmenv_com_ca_apm_kubernetes_prometheus_autodiscovery
+          value: "true"
+        - name: type
+          value: {{ .Values.type }}
+        - name: MIN_HEAP_VAL_IN_MB
+          value: "64"
+
+        name: kubernetesservice
+        image: {{ .Values.image }}
+{{- if .Values.kubernetes_resource_bound }}
+        resources:
+          limits:
+            cpu: 2
+            memory: 1G
+          requests:
+            cpu: 200m
+            memory: 300Mi
+{{end}}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - "if (( $(expr `date +%s` - `stat -c %Y /tmp/apmia-health/extensions/prometheus-health.txt`) > 120 )); then exit 1; fi"
+          initialDelaySeconds: 120
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/local/openshift/apmia/extensions/KubernetesRemoteMonitor/config/prometheus
+      restartPolicy: Always
+      volumes:
+      - name: config-volume
+        configMap:
+          name: caaiops-config-prometheus
+  selector:
+    matchLabels:
+      app: prometheus-deployment
+{{end}}
