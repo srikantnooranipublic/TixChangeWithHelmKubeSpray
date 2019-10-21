@@ -6,8 +6,8 @@
 
 #!/bin/bash
 
-HOST_IPS="10.12.1.1 12.54.12.12 13.56.43.45"
-HOST_IPS="10.74.57.152 10.74.57.153 10.74.57.154"
+HC_FOLDER=`dirname $BASH_SOURCE`
 
+. ./$HC_FOLDER/../config.ini
 
 for host in $HOST_IPS; do echo $host; ssh root@$host " $*"; done
