@@ -45,9 +45,9 @@ sleep 2
     RAND_MINUTES=`echo $(( $RAND + $BASE_MINUTES ))`
 
     #preventing executing > once  in the same 15 mts window
-    if [ $CURRENT_MINUTES  -lt $RAND_MINUTES ]; then
-      RAND_MINUTES=30
-    fi
+#    if [ $CURRENT_MINUTES  -lt $RAND_MINUTES ]; then
+      #RAND_MINUTES=30
+    #fi
 
     EXECUTED=false
   fi
