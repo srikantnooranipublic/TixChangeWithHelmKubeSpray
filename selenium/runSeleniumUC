@@ -44,6 +44,11 @@ sleep 2
     RAND=`echo $((1 + RANDOM % $RANDOMIZER ))`
     RAND_MINUTES=`echo $(( $RAND + $BASE_MINUTES ))`
 
+    #preventing executing > once  in the same 15 mts window
+    if [ $CURRENT_MINUTES  -lt $RAND_MINUTES ]; then
+      RAND_MINUTES=30
+    fi
+
     EXECUTED=false
   fi
 
@@ -61,7 +66,16 @@ sleep 2
 
   echo "running slow UC1"
     selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
-sleep 2
+sleep 5
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+    sleep 5
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+    sleep 5
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+    sleep 5
   echo "running slow UC1"
     selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
     sleep 5
