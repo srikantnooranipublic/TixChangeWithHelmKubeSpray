@@ -1,4 +1,9 @@
-echo "pls provide the token (this is OI token not APM - use browser dev mode and go to request header section under network for a request and look for Authorization Bearer token )"
+echo ""
+echo "***********"
+echo "create service in GCP SaaS instance"
+echo ""
+echo "pls provide the OI token (this is OI token not APM - Go to Service Overview Page of the OI. Open browser dev mode and go to request header section under network tab for a request (say click on status circle) and look for Authorization Bearer token )"
+echo ""
 
 read OI_TOKEN
 
@@ -7,6 +12,12 @@ if [ X"$OI_TOKEN" == "X" ]; then
    exit
 
 fi
+
+echo " "
+
+echo " This will create an OI service - give it a minute or two and refresh your browser"
+
+echo ""
 
 curl -v -X POST \
   https://doi.dxi-na1.saas.broadcom.com/oi/v2/sa/save \
@@ -163,3 +174,5 @@ curl -v -X POST \
     ]
 }
 '
+
+echo ""
