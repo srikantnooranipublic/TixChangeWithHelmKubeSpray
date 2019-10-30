@@ -29,23 +29,23 @@ curl -v -X POST \
         {
             "attributes": {
                 "host": "saService",
-                "name": "TixChange Global",
+                "name": "TixChange Global US",
                 "state": "ACTIVE",
                 "serviceContent": [],
                 "root_service": [
-                    "TixChange Global"
+                    "TixChange Global US"
                 ],
                 "tags": [],
                 "location": "",
                 "description": "",
                 "customProperties": []
             },
-            "externalId": "TixChange Global"
+            "externalId": "TixChange Global US"
         },
         {
             "attributes": {
                 "host": "saService",
-                "name": "TixChange EastCoastUS DC",
+                "name": "TixChange EastCoast DC",
                 "state": "ACTIVE",
                 "serviceContent": [
                     {
@@ -66,19 +66,19 @@ curl -v -X POST \
                     }
 		],
                 "root_service": [
-                    "TixChange Global"
+                    "TixChange Global US"
                 ],
                 "tags": [],
                 "location": "",
                 "description": "",
                 "customProperties": []
             },
-            "externalId": "TixChange EastCoastUS DC"
+            "externalId": "TixChange EastCoast DC"
         },
         {
             "attributes": {
                 "host": "saService",
-                "name": "TixChange WestCoastUS DC",
+                "name": "TixChange WestCoast DC",
                 "state": "ACTIVE",
                 "serviceContent": [
 		 {
@@ -107,19 +107,19 @@ curl -v -X POST \
                     }
 		],
                 "root_service": [
-                    "TixChange Global"
+                    "TixChange Global US"
                 ],
                 "tags": [],
                 "location": "",
                 "description": "",
                 "customProperties": []
             },
-            "externalId": "TixChange WestCoastUS DC"
+            "externalId": "TixChange WestCoast DC"
         },
         {
             "attributes": {
                 "host": "saService",
-                "name": "Event Management",
+                "name": "Event Management US",
                 "state": "ACTIVE",
                 "serviceContent": [
 		 {
@@ -132,21 +132,21 @@ curl -v -X POST \
                     }
 		],
                 "root_service": [
-                    "TixChange Global"
+                    "TixChange Global US"
                 ],
                 "tags": [],
                 "location": "",
                 "description": "",
                 "customProperties": []
             },
-            "externalId": "Event Management"
+            "externalId": "Event Management US"
         }
 
             ],
     "edges": [
         {
-            "targetExternalId": "TixChange EastCoastUS DC",
-            "sourceExternalId": "TixChange Global",
+            "targetExternalId": "TixChange EastCoast DC",
+            "sourceExternalId": "TixChange Global US",
             "attributes": {
                 "health_weight": 0.33299999999999996,
                 "risk_weight": 0.33299999999999996,
@@ -154,8 +154,8 @@ curl -v -X POST \
             }
         },
         {
-            "targetExternalId": "TixChange WestCoastUS DC",
-            "sourceExternalId": "TixChange Global",
+            "targetExternalId": "TixChange WestCoast DC",
+            "sourceExternalId": "TixChange Global US",
             "attributes": {
                 "health_weight": 0.33299999999999996,
                 "risk_weight": 0.33299999999999996,
@@ -163,8 +163,8 @@ curl -v -X POST \
             }
         },
         {
-            "targetExternalId": "Event Management",
-            "sourceExternalId": "TixChange Global",
+            "targetExternalId": "Event Management US",
+            "sourceExternalId": "TixChange Global US",
             "attributes": {
                 "health_weight": 0.33299999999999996,
                 "risk_weight": 0.33299999999999996,
