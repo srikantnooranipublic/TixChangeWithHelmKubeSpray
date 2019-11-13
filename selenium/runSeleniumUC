@@ -66,28 +66,58 @@ sleep 2
 
   echo "running slow UC1"
     selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
-sleep 5
+sleep 2
   echo "running slow UC1"
     selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
-    sleep 5
+    sleep 2
   echo "running normal UC2"
   selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc2.jtixchange.com/ ./TixChangeSelenium.side 
 sleep 2 
   echo "running slow UC1"
     selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
-    sleep 5
+    sleep 2
   echo "running normal UC2"
   selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc2.jtixchange.com/ ./TixChangeSelenium.side 
 sleep 2 
   echo "running slow UC1"
     selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
-    sleep 5
+    sleep 2
   echo "running normal UC2"
   selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc2.jtixchange.com/ ./TixChangeSelenium.side 
 sleep 2 
   echo "running slow UC1"
     selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
-    sleep 5
+    sleep 2
+  echo "running normal UC2"
+  selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc2.jtixchange.com/ ./TixChangeSelenium.side
+sleep 2
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+    sleep 2
+  echo "running normal UC2"
+  selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc2.jtixchange.com/ ./TixChangeSelenium.side
+sleep 2
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+    sleep 2
+  echo "running normal UC2"
+  selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc2.jtixchange.com/ ./TixChangeSelenium.side
+sleep 2
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+    sleep 2
+  echo "running normal UC2"
+  selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc2.jtixchange.com/ ./TixChangeSelenium.side
+sleep 2
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+    sleep 2
+  echo "running normal UC2"
+  selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc2.jtixchange.com/ ./TixChangeSelenium.side
+sleep 2
+  echo "running slow UC1"
+    selenium-side-runner   -c "browserName=chrome chromeOptions.args=[disable-infobars, headless, no-sandbox]" --base-url http://uc1.jtixchange.com/ ./TixChangeSeleniumSlowLogin.side
+    sleep 2
   fi 
 
 done
