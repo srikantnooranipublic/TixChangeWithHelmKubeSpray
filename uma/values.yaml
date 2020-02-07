@@ -58,7 +58,7 @@ kubernetes_resource_bound: true
 
 # Name of the image
 
-image: caapm/universalmonitoragent:latest
+image: caapm/universalmonitoragent:11.1.2
 
 # Type of the Kubernetes Deployment. In case of Openshift, change this to Openshift
 type: Kubernetes
